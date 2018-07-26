@@ -18,11 +18,14 @@ use core::panic::PanicInfo;
 
 #[macro_use]
 mod vga_buffer;
+#[macro_use]
+mod log;
 
 #[cfg(not(test))]
 #[panic_implementation]
 #[no_mangle]
-pub fn panic(_info: &PanicInfo) -> ! {
+pub fn panic(info: &PanicInfo) -> ! {
+    error!("{}", info);
     loop {}
 }
 
@@ -30,6 +33,8 @@ pub fn panic(_info: &PanicInfo) -> ! {
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
     println!("Hello, world!");
-    println!("2 + 2 = {} and 65.0 / 9.0 = {}", 2 + 2, 65.0 / 9.0);
+    debug!("2 + 2 = {} and 65.0 / 9.0 = {}", 2 + 2, 65.0 / 9.0);
+    error!("Errors look like this");
+    info!("Beginning infinite loop...");
     loop {}
 }

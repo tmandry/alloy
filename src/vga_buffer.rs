@@ -1,4 +1,4 @@
-use core::fmt;
+use core::{fmt, mem};
 use spin::Mutex;
 use volatile::Volatile;
 
@@ -8,7 +8,7 @@ lazy_static! {
     /// Used by the `print!` and `println!` macros.
     pub static ref WRITER: Mutex<Writer> = Mutex::new(Writer {
         column_position: 0,
-        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        color_code: ColorCode::new(Color::LightGray, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     });
 }
@@ -44,6 +44,16 @@ impl ColorCode {
     /// Create a new `ColorCode` with the given foreground and background colors.
     fn new(foreground: Color, background: Color) -> ColorCode {
         ColorCode((background as u8) << 4 | (foreground as u8))
+    }
+
+    // fn foreground(&self) -> Color {
+    //     let code = self.0 & 0x0f;
+    //     unsafe { mem::transmute(code) }
+    // }
+
+    fn background(&self) -> Color {
+        let code = self.0 >> 4;
+        unsafe { mem::transmute(code) }
     }
 }
 
@@ -114,6 +124,17 @@ impl Writer {
                 _ => self.write_byte(0xfe),
             }
         }
+    }
+
+    /// Prints the given ASCII string to the VGA text buffer with the given foreground color.
+    /// 
+    /// This function restores the old color after it finishes.
+    pub fn write_str_with_foreground(&mut self, foreground: Color, s: &str) -> fmt::Result {
+        let old_color = self.color_code;
+        self.color_code = ColorCode::new(foreground, old_color.background());
+        self.write_string(s);
+        self.color_code = old_color;
+        Ok(())
     }
 
     /// Shifts all lines one line up and clears the last row.
