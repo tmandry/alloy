@@ -1,0 +1,10 @@
+[package]
+name = "alloy"
+version = "0.0.0"
+authors = ["Tyler Mandry <tmandry@gmail.com>"]
+
+[package.metadata.bootimage]
+default-target = "x86_64-alloy.json"
+
+[dependencies]
+bootloader_precompiled = "0.2.0"
