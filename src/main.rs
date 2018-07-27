@@ -1,28 +1,12 @@
+#![feature(panic_implementation)]
 #![no_std]
 #![cfg_attr(not(test), no_main)]
 #![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
-#![feature(panic_implementation, start)]
-
-extern crate bootloader_precompiled;
-#[macro_use]
-extern crate lazy_static;
-extern crate spin;
-extern crate volatile;
-extern crate uart_16550;
-
-#[cfg(test)]
-extern crate array_init;
-#[cfg(test)]
-extern crate std;
 
 use core::panic::PanicInfo;
 
 #[macro_use]
-mod log;
-#[macro_use]
-mod serial;
-#[macro_use]
-mod vga_buffer;
+extern crate alloy;
 
 #[cfg(not(test))]
 #[panic_implementation]

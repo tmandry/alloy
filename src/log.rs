@@ -22,6 +22,7 @@ macro_rules! error {
     }
 }
 
+#[macro_export]
 macro_rules! format_log {
     ($fmt:expr) => (format_args!(concat!(": ", $fmt, "\n")));
     ($fmt:expr, $($arg:tt)*) => (format_args!(concat!(": ", $fmt, "\n"), $($arg)*));
