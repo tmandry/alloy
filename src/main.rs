@@ -23,6 +23,9 @@ pub extern "C" fn _start() -> ! {
     debug!("2 + 2 = {} and 65.0 / 9.0 = {}", 2 + 2, 65.0 / 9.0);
     error!("Errors look like this");
     serial_println!("Hello, host! 1 + 2 = {}", 1 + 2);
-    info!("Beginning infinite loop...");
+    info!("Shutting down QEMU...");
+
+    unsafe { alloy::exit_qemu(); }
+
     loop {}
 }
