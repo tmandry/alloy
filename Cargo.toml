@@ -2,9 +2,16 @@
 name = "alloy"
 version = "0.0.0"
 authors = ["Tyler Mandry <tmandry@gmail.com>"]
+autobins = true
 
-[package.metadata.bootimage]
-default-target = "x86_64-alloy.json"
+[features]
+# Enables sending logs to the serial output for QEMU.
+# Disabled for integration tests, which must match an expected serial output.
+log_serial = []
+
+[[bin]]
+name = "alloy"
+path = "src/main.rs"
 
 [dependencies]
 bootloader_precompiled = "0.2.0"
@@ -19,3 +26,6 @@ features = ["spin_no_std"]
 
 [dev-dependencies]
 array-init = "0.0.3"
+
+[package.metadata.bootimage]
+default-target = "x86_64-alloy.json"

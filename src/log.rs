@@ -1,5 +1,7 @@
 use core::fmt;
-use vga_buffer::{Color, WRITER};
+use core::fmt::Write;
+use serial;
+use vga_buffer::{self, Color};
 
 #[macro_export]
 macro_rules! debug {
@@ -29,8 +31,20 @@ macro_rules! format_log {
 }
 
 pub fn log_with_header(header: &'static str, color: Color, args: fmt::Arguments) {
-    use core::fmt::Write;
-    let mut w = WRITER.lock();
+    log_to_console(header, color, args);
+    if cfg!(feature = "log_serial") {
+        log_to_serial(header, color, args);
+    }
+}
+
+fn log_to_console(header: &'static str, color: Color, args: fmt::Arguments) {
+    let mut w = vga_buffer::WRITER.lock();
     w.write_str_with_foreground(color, header).unwrap();
+    w.write_fmt(args).unwrap();
+}
+
+fn log_to_serial(header: &'static str, _color: Color, args: fmt::Arguments) {
+    let mut w = serial::SERIAL1.lock();
+    w.write_str(header).unwrap();
     w.write_fmt(args).unwrap();
 }
