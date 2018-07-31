@@ -1,26 +1,25 @@
 use core::fmt;
 use core::fmt::Write;
-use serial;
-use vga_buffer::{self, Color};
+use io::{Color, serial, vga_buffer};
 
 #[macro_export]
 macro_rules! debug {
     ($($arg:tt)*) => {
-        $crate::log::log_with_header("DEBUG", $crate::vga_buffer::Color::DarkGray, format_log!($($arg)*));
+        $crate::log::log_with_header("DEBUG", $crate::io::Color::DarkGray, format_log!($($arg)*));
     }
 }
 
 #[macro_export]
 macro_rules! info {
     ($($arg:tt)*) => {
-        $crate::log::log_with_header("INFO ", $crate::vga_buffer::Color::White, format_log!($($arg)*));
+        $crate::log::log_with_header("INFO ", $crate::io::Color::White, format_log!($($arg)*));
     }
 }
 
 #[macro_export]
 macro_rules! error {
     ($($arg:tt)*) => {
-        $crate::log::log_with_header("ERROR", $crate::vga_buffer::Color::Red, format_log!($($arg)*));
+        $crate::log::log_with_header("ERROR", $crate::io::Color::Red, format_log!($($arg)*));
     }
 }
 

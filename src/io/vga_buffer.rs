@@ -1,6 +1,7 @@
 use core::{fmt, mem};
 use spin::Mutex;
 use volatile::Volatile;
+use super::Color;
 
 lazy_static! {
     /// A global `Writer` instance that can be used for printing to the VGA text buffer.
@@ -13,27 +14,26 @@ lazy_static! {
     });
 }
 
-/// The standard color palette in VGA text mode.
-#[allow(dead_code)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u8)]
-pub enum Color {
-    Black = 0,
-    Blue = 1,
-    Green = 2,
-    Cyan = 3,
-    Red = 4,
-    Magenta = 5,
-    Brown = 6,
-    LightGray = 7,
-    DarkGray = 8,
-    LightBlue = 9,
-    LightGreen = 10,
-    LightCyan = 11,
-    LightRed = 12,
-    Pink = 13,
-    Yellow = 14,
-    White = 15,
+fn code(color: Color) -> u8 {
+    use self::Color::*;
+    match color {
+        Black => 0,
+        Blue => 1,
+        Green => 2,
+        Cyan => 3,
+        Red => 4,
+        Magenta => 5,
+        Brown => 6,
+        LightGray => 7,
+        DarkGray => 8,
+        LightBlue => 9,
+        LightGreen => 10,
+        LightCyan => 11,
+        LightRed => 12,
+        Pink => 13,
+        Yellow => 14,
+        White => 15,
+    }
 }
 
 /// A combination of a foreground and a background color.
@@ -43,7 +43,7 @@ struct ColorCode(u8);
 impl ColorCode {
     /// Create a new `ColorCode` with the given foreground and background colors.
     fn new(foreground: Color, background: Color) -> ColorCode {
-        ColorCode((background as u8) << 4 | (foreground as u8))
+        ColorCode(code(background) << 4 | code(foreground))
     }
 
     // fn foreground(&self) -> Color {
@@ -171,7 +171,7 @@ impl fmt::Write for Writer {
 /// Like the `print!` macro in the standard library, but prints to the VGA text buffer.
 #[macro_export]
 macro_rules! print {
-    ($($arg:tt)*) => ($crate::vga_buffer::print(format_args!($($arg)*)));
+    ($($arg:tt)*) => ($crate::io::vga_buffer::print(format_args!($($arg)*)));
 }
 
 /// Like the `print!` macro in the standard library, but prints to the VGA text buffer.
