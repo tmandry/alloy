@@ -1,4 +1,5 @@
 #![no_std]
+#![feature(crate_visibility_modifier)]
 
 extern crate bootloader_precompiled;
 #[macro_use]

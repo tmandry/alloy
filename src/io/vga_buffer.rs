@@ -1,7 +1,7 @@
+use super::{Color, WriteColor};
 use core::{fmt, mem};
 use spin::Mutex;
 use volatile::Volatile;
-use super::Color;
 
 lazy_static! {
     /// A global `Writer` instance that can be used for printing to the VGA text buffer.
@@ -23,14 +23,14 @@ fn code(color: Color) -> u8 {
         Cyan => 3,
         Red => 4,
         Magenta => 5,
-        Brown => 6,
+        //Brown => 6,
         LightGray => 7,
         DarkGray => 8,
         LightBlue => 9,
         LightGreen => 10,
         LightCyan => 11,
         LightRed => 12,
-        Pink => 13,
+        //Pink => 13,
         Yellow => 14,
         White => 15,
     }
@@ -126,17 +126,6 @@ impl Writer {
         }
     }
 
-    /// Prints the given ASCII string to the VGA text buffer with the given foreground color.
-    /// 
-    /// This function restores the old color after it finishes.
-    pub fn write_str_with_foreground(&mut self, foreground: Color, s: &str) -> fmt::Result {
-        let old_color = self.color_code;
-        self.color_code = ColorCode::new(foreground, old_color.background());
-        self.write_string(s);
-        self.color_code = old_color;
-        Ok(())
-    }
-
     /// Shifts all lines one line up and clears the last row.
     fn new_line(&mut self) {
         for row in 1..BUFFER_HEIGHT {
@@ -164,6 +153,19 @@ impl Writer {
 impl fmt::Write for Writer {
     fn write_str(&mut self, s: &str) -> fmt::Result {
         self.write_string(s);
+        Ok(())
+    }
+}
+
+impl WriteColor for Writer {
+    /// Prints the given ASCII string to the VGA text buffer with the given foreground color.
+    ///
+    /// This function restores the old color after it finishes.
+    fn write_str_with_foreground(&mut self, foreground: Color, s: &str) -> fmt::Result {
+        let old_color = self.color_code;
+        self.color_code = ColorCode::new(foreground, old_color.background());
+        self.write_string(s);
+        self.color_code = old_color;
         Ok(())
     }
 }
@@ -214,7 +216,7 @@ mod test {
     fn empty_char() -> ScreenChar {
         ScreenChar {
             ascii_character: b' ',
-            color_code: ColorCode::new(Color::Green, Color::Brown),
+            color_code: ColorCode::new(Color::Green, Color::Red),
         }
     }
 
