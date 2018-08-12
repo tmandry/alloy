@@ -12,6 +12,7 @@ log_serial = []
 [[bin]]
 name = "alloy"
 path = "src/main.rs"
+required-features = ["log_serial"]
 
 [dependencies]
 bootloader_precompiled = "0.2.0"
