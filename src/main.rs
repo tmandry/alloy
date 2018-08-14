@@ -28,10 +28,19 @@ pub extern "C" fn _start() -> ! {
     // Invoke a breakpoint exception
     x86_64::instructions::int3();
 
-    fn stack_overflow() {
-        stack_overflow();
-    }
-    stack_overflow();
+    debug!("Initializing PIC");
+    alloy::pic::init();
+
+    debug!("Enabling interrupts");
+    x86_64::instructions::interrupts::enable();
+
+    debug!("Looping forever...");
+    loop {}
+
+    //fn stack_overflow() {
+    //    stack_overflow();
+    //}
+    //stack_overflow();
 
     info!("Shutting down QEMU...");
     unsafe { alloy::exit_qemu(); }
@@ -50,11 +59,17 @@ pub fn panic(info: &PanicInfo) -> ! {
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
+
         idt.breakpoint.set_handler_fn(handle_breakpoint);
+        idt.segment_not_present.set_handler_fn(handle_segment_not_present);
 
         unsafe {
             idt.double_fault.set_handler_fn(handle_double_fault)
                             .set_stack_index(alloy::gdt::DOUBLE_FAULT_IST_INDEX);
+        }
+
+        for i in 32..48 {
+            idt[i].set_handler_fn(handle_int_other);
         }
 
         idt
@@ -74,4 +89,15 @@ extern "x86-interrupt" fn handle_double_fault(
 {
     error!("EXCEPTION: Double fault\n{:#?}", stack_frame);
     loop {}
+}
+
+extern "x86-interrupt" fn handle_segment_not_present(
+    stack_frame: &mut ExceptionStackFrame, _error_code: u64)
+{
+    // Usually, this occurs because of an empty entry for an interrupt.
+    error!("EXCEPTION: Segment not present\n{:#?}", stack_frame);
+}
+
+extern "x86-interrupt" fn handle_int_other(_stack_frame: &mut ExceptionStackFrame) {
+    debug!("Interrupt occurred");
 }

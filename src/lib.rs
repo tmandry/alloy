@@ -4,9 +4,10 @@
 extern crate bootloader_precompiled;
 #[macro_use]
 extern crate lazy_static;
+extern crate pic8259_simple;
 extern crate spin;
-extern crate volatile;
 extern crate uart_16550;
+extern crate volatile;
 extern crate x86_64;
 
 #[cfg(test)]
@@ -17,6 +18,7 @@ extern crate std;
 pub mod gdt;
 pub mod io;
 pub mod log;
+pub mod pic;
 
 pub unsafe fn exit_qemu() {
     use x86_64::instructions::port::Port;
