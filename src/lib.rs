@@ -1,5 +1,6 @@
 #![no_std]
 #![feature(crate_visibility_modifier)]
+#![feature(crate_in_paths)]
 
 extern crate bootloader_precompiled;
 #[macro_use]
@@ -13,11 +14,15 @@ extern crate x86_64;
 #[cfg(test)]
 extern crate array_init;
 #[cfg(test)]
+#[macro_use]
 extern crate std;
 
+#[macro_use]
+pub mod log;
+
+pub mod frame;
 pub mod gdt;
 pub mod io;
-pub mod log;
 pub mod pic;
 
 pub unsafe fn exit_qemu() {
